@@ -1,5 +1,0 @@
-{
-  packageOverrides = super: let self = super.pkgs; in {
-    myemacs = import /path/to/emacs.nix { pkgs = self; };
-  };
-}
