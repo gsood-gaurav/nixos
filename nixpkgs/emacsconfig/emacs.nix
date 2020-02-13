@@ -38,7 +38,6 @@ cp ${myEmacsConfig} $out/share/emacs/site-lisp/default.el
   vlf          # ; Manipulating very large files
   direnv       # ;
   use-package  # ;
-  
   ]) ++ [
     pkgs.notmuch   # From main packages set 
   ])
