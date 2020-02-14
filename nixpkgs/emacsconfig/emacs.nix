@@ -102,6 +102,7 @@ cp ${myEmacsConfig} $out/share/emacs/site-lisp/default.el
 
   company                       # ;Completion Framework
   company-nixos-options
+  
   ]) ++ [
     pkgs.notmuch   # From main packages set 
   ])
