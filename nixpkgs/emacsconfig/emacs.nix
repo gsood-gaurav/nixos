@@ -66,7 +66,18 @@ let
 (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
 ;; Company
 (add-hook 'after-init-hook 'global-company-mode)
-
+;; Nix Mode
+(use-package nix-mode
+  :mode ("\\.nix\\'" "\\.nix.in\\'"))
+(use-package nix-drv-mode
+  :ensure nix-mode
+  :mode "\\.drv\\'")
+(use-package nix-shell
+  :ensure nix-mode
+  :commands (nix-shell-unpack nix-shell-configure nix-shell-build))
+(use-package nix-repl
+  :ensure nix-mode
+  :commands (nix-repl))
 '';
 in
 emacsWithPackages (epkgs: (with epkgs.melpaStablePackages; [
