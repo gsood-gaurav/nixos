@@ -65,7 +65,10 @@ let
 (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
 (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
 ;; Company
+(use-package company
+:config
 (add-hook 'after-init-hook 'global-company-mode)
+(add-to-list 'company-backends 'company-nixos-options))
 ;; Nix Mode
 (use-package nix-mode
   :mode ("\\.nix\\'" "\\.nix.in\\'"))
@@ -98,6 +101,7 @@ cp ${myEmacsConfig} $out/share/emacs/site-lisp/default.el
   swiper
 
   company                       # ;Completion Framework
+  company-nixos-options
   ]) ++ [
     pkgs.notmuch   # From main packages set 
   ])
