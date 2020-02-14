@@ -75,9 +75,13 @@ mkdir -p $out/share/emacs/site-lisp
 cp ${myEmacsConfig} $out/share/emacs/site-lisp/default.el
 '')
   magit          # ; Integrate git <C-x g>
+  
   zerodark-theme # ; Nicolas' theme
+  
   nix-mode	   # ; Nix Mode editing
-  use-package  # ; 
+  
+  use-package  # ;
+  
   ivy          # ; Incremental Completion Framework
   counsel
   swiper
