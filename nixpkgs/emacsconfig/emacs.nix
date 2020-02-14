@@ -85,6 +85,7 @@ cp ${myEmacsConfig} $out/share/emacs/site-lisp/default.el
   ivy          # ; Incremental Completion Framework
   counsel
   swiper
+
   company                       # ;Completion Framework
   ]) ++ [
     pkgs.notmuch   # From main packages set 
