@@ -81,6 +81,21 @@ let
 (use-package nix-repl
   :ensure nix-mode
   :commands (nix-repl))
+;; Haskell Mode
+(use-package dante
+  :ensure t
+  :after haskell-mode
+  :commands 'dante-mode
+  :init
+  ;; (add-hook 'haskell-mode-hook 'flycheck-mode)
+  ;; OR:
+  ;; (add-hook 'haskell-mode-hook 'flymake-mode)
+  (add-hook 'haskell-mode-hook 'dante-mode)
+  )
+;; Direnv Mode
+(use-package direnv
+ :config
+ (direnv-mode))
 '';
 in
 emacsWithPackages (epkgs: (with epkgs.melpaStablePackages; [
@@ -102,6 +117,11 @@ cp ${myEmacsConfig} $out/share/emacs/site-lisp/default.el
 
   company                       # ;Completion Framework
   company-nixos-options
+
+  haskell-mode
+  dante
+
+  direnv
   
   ]) ++ [
     pkgs.notmuch   # From main packages set 
