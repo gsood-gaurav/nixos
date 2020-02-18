@@ -33,6 +33,7 @@ let
 (set-keyboard-coding-system 'utf-8)
 (set-language-environment 'utf-8)
 (prefer-coding-system 'utf-8)
+(global-hl-line-mode 1)
 (setq
    backup-by-copying t      ; don't clobber symlinks
    backup-directory-alist
@@ -46,6 +47,7 @@ let
 :ensure t
 :config
 (ivy-mode 1)
+(setq ivy-count-format "(%d/%d) ")
 (setq ivy-use-virtual-buffers t)
 (setq enable-recursive-minibuffers t)
 (global-set-key "\C-s" 'swiper)
@@ -87,15 +89,20 @@ let
   :after haskell-mode
   :commands 'dante-mode
   :init
-  ;; (add-hook 'haskell-mode-hook 'flycheck-mode)
+  (add-hook 'haskell-mode-hook 'flycheck-mode)
   ;; OR:
   ;; (add-hook 'haskell-mode-hook 'flymake-mode)
   (add-hook 'haskell-mode-hook 'dante-mode)
+;;  (setq dante-repl-command-line '("nix-shell" "--run" "cabal new-repl"))
   )
 ;; Direnv Mode
 (use-package direnv
  :config
  (direnv-mode))
+;; FlyCheck
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
 '';
 in
 emacsWithPackages (epkgs: (with epkgs.melpaStablePackages; [
@@ -122,6 +129,8 @@ cp ${myEmacsConfig} $out/share/emacs/site-lisp/default.el
   dante
 
   direnv
+
+  flycheck
   
   ]) ++ [
     pkgs.notmuch   # From main packages set 
