@@ -70,7 +70,8 @@ let
 (use-package company
 :config
 (add-hook 'after-init-hook 'global-company-mode)
-(add-to-list 'company-backends 'company-nixos-options))
+(add-to-list 'company-backends 'company-nixos-options)
+(add-to-list 'company-backends 'company-anaconda))
 ;; Nix Mode
 (use-package nix-mode
   :mode ("\\.nix\\'" "\\.nix.in\\'"))
@@ -103,6 +104,10 @@ let
 (use-package flycheck
   :ensure t
   :init (global-flycheck-mode))
+;; Python
+(add-hook 'python-mode-hook 'anaconda-mode)
+(add-hook 'python-mode-hook 'anaconda-eldoc-mode)
+
 '';
 in
 emacsWithPackages (epkgs: (with epkgs.melpaStablePackages; [
@@ -124,6 +129,7 @@ cp ${myEmacsConfig} $out/share/emacs/site-lisp/default.el
 
   company                       # ;Completion Framework
   company-nixos-options
+  company-anaconda
 
   haskell-mode
   dante
@@ -131,6 +137,10 @@ cp ${myEmacsConfig} $out/share/emacs/site-lisp/default.el
   direnv
 
   flycheck
+
+  anaconda-mode
+  pythonic
+
   
   ]) ++ [
     pkgs.notmuch   # From main packages set 
