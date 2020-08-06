@@ -37,7 +37,7 @@ let
 (global-set-key (kbd "C-c l") 'org-store-link)
 (global-set-key (kbd "C-c a") 'org-agenda)
 (global-set-key (kbd "C-c c") 'org-capture)
-(setq org-agenda-files (list "~/Documents/org/agorg/*.org"))
+(setq org-agenda-files (list "~/Documents/org/agorg/tasks.org" "~/Documents/org/agorg/personal.org"))
 (setq org-log-done 'time)
 (setq org-log-done 'note)
 (org-babel-do-load-languages
@@ -83,16 +83,24 @@ let
 (global-set-key (kbd "C-c t") 'counsel-load-theme)
 (global-set-key (kbd "C-c F") 'counsel-org-file)
 ;; C++
+;; (setq ccls-executable "/nix/store/zbvj02i6gl4x95l6iazrzdjzg2cwhd5d-ccls-0.20190823.5/bin/ccls")
+;;(add-hook 'c++-mode-hook 'eglot-ensure)
+;;(add-hook 'c-mode-hook 'eglot-ensure)
+(use-package ccls
+  :hook ((c-mode c++-mode objc-mode cuda-mode) .
+         (lambda () (require 'ccls) (lsp))))
+(add-hook 'c++-mode-hook #'lsp)
+(add-hook 'c-mode-hook #'lsp)
 (setq ccls-executable "/nix/store/zbvj02i6gl4x95l6iazrzdjzg2cwhd5d-ccls-0.20190823.5/bin/ccls")
-(add-hook 'c++-mode-hook 'eglot-ensure)
-(add-hook 'c-mode-hook 'eglot-ensure)
 ;; Company Mode
 (add-hook 'after-init-hook 'global-company-mode)
 (company-quickhelp-mode)
 ;; Anancoda mode
-(require 'anaconda-mode)
-(add-hook 'python-mode-hook 'anaconda-mode)
-(add-hook 'python-mode-hook 'anaconda-eldoc-mode)
+;; (require 'anaconda-mode)
+;; (add-hook 'python-mode-hook 'anaconda-mode)
+;; (add-hook 'python-mode-hook 'anaconda-eldoc-mode)
+(add-hook 'python-mode-hook #'lsp)
+(setq lsp-pyls-server-command "/nix/store/famrgkkpmxpbh3wvpxmdyq0cncdfmild-python3.7-python-language-server-0.29.1/bin/pyls")
 (eval-after-load "company"
  '(add-to-list 'company-backends 'company-anaconda))
 (use-package direnv
@@ -116,7 +124,17 @@ let
 (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
 (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
 (push 'company-lsp company-backends)
-
+(setq company-clang-executable "/nix/store/268swz1wq5p8cbbll580vv0mgqm0n4an-clang-wrapper-7.1.0/bin/clang")
+;;(use-package company-box
+;;  :hook (company-mode . company-box-mode))
+(setq lsp-prefer-flymake nil)
+(yas-global-mode)
+(powerline-default-theme)
+(smartparens-global-mode)
+(add-hook 'prog-mode-hook 'rainbow-identifiers-mode)
+(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+(add-hook 'scheme-mode-hook 'rainbow-blocks-mode)
+(add-to-list 'company-backends 'company-nixos-options)
 '';
 in
 {
@@ -143,11 +161,20 @@ myemacs = emacsWithPackages (epkgs: (with epkgs.melpaStablePackages; [
   company-quickhelp
   direnv
   counsel-projectile
+  yasnippet
+  yasnippet-snippets
+  powerline
+  smartparens
+  rainbow-delimiters
+  rainbow-blocks
+  rainbow-identifiers
+  company-nixos-options
+  nixos-options
 ])
 # company quick help throws error in anaconda mode due to melpa stable package anaconda-mode 0.1.12
 # function "anaconda-mode-with-text-buffer" was not working. As a workaround all the following
 # dependencies needs to be installed from the melpapackages.
-++ (with epkgs.melpaPackages; [ pythonic anaconda-mode company-anaconda lsp-mode lsp-ui lsp-haskell company-lsp lsp-ivy lsp-treemacs ])
+++ (with epkgs.melpaPackages; [ pythonic anaconda-mode company-anaconda lsp-mode lsp-ui lsp-haskell company-lsp lsp-ivy lsp-treemacs ccls company-box ])
 
 );
 }
