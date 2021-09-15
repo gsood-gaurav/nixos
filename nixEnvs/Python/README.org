@@ -3,3 +3,10 @@
   - tf_metrics is not checkout from github, source is downloaded from github
     from the following link.
     https://github.com/guillaumegenthial/tf_metrics.git
+
+Below quote in shell.nix enables jump to python std library functions.
+    #+BEGIN_QUOTE
+  shellHook = ''
+export PATH=/nix/store/6gmy3n7sxyf5w6zmm2gnnylq1xhk12n7-python3-3.8.9-env/lib/python3.8:$PATH
+'';
+    #+END_QUOTE
