@@ -9,8 +9,10 @@ paths = [
   gnomeExtensions.dash-to-dock
   texlive.combined.scheme-full
   libreoffice
-  vscode-with-extensions
   ccls
+  nix-prefetch-git
+  nix-prefetch-github
+  jupyter
 ];
 };
 }
