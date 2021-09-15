@@ -1,0 +1,5 @@
+* Python Nix Environment
+  - Setup for MachineLearning
+  - tf_metrics is not checkout from github, source is downloaded from github
+    from the following link.
+    https://github.com/guillaumegenthial/tf_metrics.git
