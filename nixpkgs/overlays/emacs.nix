@@ -1,8 +1,8 @@
 self: super:
 
 let
-  myEmacs = super.emacs27; 
-  emacsWithPackages = ((super.emacsPackagesGen myEmacs).overrideScope' overrides).emacsWithPackages;
+  myEmacs = super.hiPrio self.emacsGit; 
+  emacsWithPackages = ((self.emacsPackagesGen myEmacs).overrideScope' overrides).emacsWithPackages;
   myEmacsConfig = super.writeText "default.el" ''
 (require 'package)
 (package-initialize)
@@ -146,16 +146,55 @@ let
 (setq lsp-headerline-breadcrumb-enable nil)
 (lsp-treemacs-sync-mode 1)
 (add-to-list 'company-backends 'company-ob-ipython)
-'';
-  
+(use-package eaf
+  :custom
+  ; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
+  (eaf-browser-continue-where-left-off t)
+  (eaf-browser-enable-adblocker t)
+  (browse-url-browser-function 'eaf-open-browser)
+  :config
+  (defalias 'browse-web #'eaf-open-browser))
+;;  (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
+;;  (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
+;;  (eaf-bind-key take_photo "p" eaf-camera-keybinding)
+;;  (eaf-bind-key nil "M-q" eaf-browser-keybinding)) ;; unbind, see more in the Wiki
+(require 'eaf-browser)
+
+''; 
   overrides = eself: esuper: rec {
-    lsp-mode = esuper.lsp-mode.override {
-      melpaBuild = args: esuper.melpaBuild (args // {
+    lsp-mode = esuper.lsp-mode.override rec {
+      melpaBuild = args: esuper.melpaBuild (args // rec {
+        name = "lsp-mode-${version}";
+        version = "8.0.0";
         src = (super.fetchFromGitHub {
           repo = "lsp-mode";
           owner = "emacs-lsp";
           rev = "8.0.0";
           sha256="1a6jc9sxf9b8fj9h8xlv5k546bkzsy8j5nj19cfama389z0bzcsl";
+        });
+      });
+    };
+    lsp-ui = esuper.lsp-ui.override {
+      melpaBuild = args: esuper.melpaBuild (args // rec {
+        name = "lsp-ui-${version}";
+        version = "8.0.0";
+        src = (super.fetchFromGitHub {
+          repo = "lsp-ui";
+          owner = "emacs-lsp";
+          rev = "8.0.0";
+          sha256="00yirx6qzlb8fv8rd53zaw93nw72z3br40rb16scdqj1v20qsp47";
+        });
+      });
+    };
+    lsp-ivy = esuper.lsp-ivy.override {
+      melpaBuild = args: esuper.melpaBuild (args // rec {
+        name = "lsp-ivy-${version}";
+        version = "0.5";
+        src = (super.fetchFromGitHub {
+          repo = "lsp-ivy";
+          owner = "emacs-lsp";
+          rev = "0.5";
+          sha256 = "0nb9ypa8hyx7i38rbywh8hn2i5f9l2l567hvdr9767fk279yr97n";
         });
       });
     };
@@ -211,6 +250,57 @@ let
   #   };
   #   emacs = myEmacs;
   # };
+
+  eaf-browser = self.emacsPackages.trivialBuild rec {
+    pname = "eaf-browser";
+    version = "1.0";
+    src = super.fetchFromGitHub {
+      repo = "eaf-browser";
+      owner = "emacs-eaf";
+      rev = "aa4b9b089c76ff91e0c8ccb5a1a8c2f8b816ec89";
+      sha256 = "041mbdwqplxfnrfgywv5py5awr7la1k905pj066ifzfcy9gfwm7c";
+    };
+    nativeBuildInputs = [super.qt5.wrapQtAppsHook];
+    buildInputs = [super.qt5.qtbase super.emacsPackages.aria2];
+    buildPhase =
+      ''
+         mkdir -p $out/share/emacs/site-lisp/elpa/${pname}-${version}/eaf-browser
+         find ./ -name "*.el" -type f -print0 | xargs -0 -I "{}" install "{}" $out/share/emacs/site-lisp/elpa/${pname}-${version}/eaf-browser
+         find ./ -name "*.py" -type f -print0 | xargs -0 -I "{}" install "{}" $out/share/emacs/site-lisp/elpa/${pname}-${version}/eaf-browser
+'';
+    installPhase = ''
+                 echo ""
+                 export QT_QPA_PLATFORM_PLUGIN_PATH="${super.qt5.qtbase.bin}/lib/qt-${super.qt5.qtbase.version}/plugins";
+
+'';
+
+  };
+
+  eaf-application-framework = self.emacsPackages.trivialBuild rec {
+    pname = "emacs-application-framework";
+    version = "1.0";
+    src = super.fetchFromGitHub {
+      repo = "emacs-application-framework";
+      owner = "emacs-eaf";
+      rev = "962a3b98e01406f91cf12119ceb0671a6b7e097a";
+      sha256 = "0rxmlw04gfb7gylcdy6f2fdrmp8j6ap4f2qsai0j55imwpp7w9lb";
+    };
+    buildInputs = [super.emacsPackages.aria2 super.python3 super.python3Packages.pyqt5_with_qtwebkit ];
+    propagatedbuildInputs = [super.python3 super.python3Packages.pyqt5_with_qtwebkit ];
+    buildPhase =
+      ''
+         mkdir -p $out/share/emacs/site-lisp/elpa/${pname}-${version}/emacs-application-framework
+         find ./ -name "*.el" -type f -print0 | xargs -0 -I "{}" install "{}" $out/share/emacs/site-lisp/elpa/${pname}-${version}/emacs-application-framework
+         find ./ -name "*.py" -type f -print0 | xargs -0 -I "{}" install "{}" $out/share/emacs/site-lisp/elpa/${pname}-${version}/emacs-application-framework
+         cp -r core $out/share/emacs/site-lisp/elpa/${pname}-${version}/emacs-application-framework
+'';
+    installPhase = ''
+                 echo ""
+                 export QT_QPA_PLATFORM_PLUGIN_PATH="${super.qt5.qtbase.bin}/lib/qt-${super.qt5.qtbase.version}/plugins";
+
+'';
+  };
+
 in
 {
 myemacs = emacsWithPackages (epkgs: (with epkgs; [
@@ -245,7 +335,7 @@ myemacs = emacsWithPackages (epkgs: (with epkgs; [
   rainbow-blocks
   rainbow-identifiers
   org-bullets
-  # org-beautify-theme
+  org-beautify-theme
   lsp-mode
   lsp-ui
   lsp-treemacs
@@ -258,7 +348,8 @@ myemacs = emacsWithPackages (epkgs: (with epkgs; [
   company-box
   highlight-indent-guides
   ob-ipython
-
+  exwm
+  google-this
 ])
 # company quick help throws error in anaconda mode due to melpa stable package anaconda-mode 0.1.12
 # function "anaconda-mode-with-text-buffer" was not working. As a workaround all the following
@@ -273,6 +364,9 @@ myemacs = emacsWithPackages (epkgs: (with epkgs; [
 #   highlight-indent-guides
 #   ob-ipython
 # ])
-#++ [ mac-classic-theme ]
+++ [
+  eaf-browser
+  eaf-application-framework
+   ]
 );
-}
+  }
