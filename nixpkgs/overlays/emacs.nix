@@ -1,7 +1,7 @@
 self: super:
 
 let
-  myEmacs = super.hiPrio self.emacsGit; 
+  myEmacs = self.emacsGcc; 
   emacsWithPackages = ((self.emacsPackagesGen myEmacs).overrideScope' overrides).emacsWithPackages;
   myEmacsConfig = super.writeText "default.el" ''
 (require 'package)
